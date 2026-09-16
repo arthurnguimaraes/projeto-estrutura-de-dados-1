@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+
+# Ambientes virtuais
+venv/
+.venv/
+env/
+ENV/
+
+# Editores/IDEs
+.vscode/
+.idea/
+*.swp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
