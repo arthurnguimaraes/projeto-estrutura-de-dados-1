@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Triagem — Protótipo</title>
+<style>
+  :root{
+    --bg:#F2F5F6;
+    --surface:#FFFFFF;
+    --surface-2:#E9EEEF;
+    --ink:#111A1C;
+    --ink-soft:#5A6B6E;
+    --ink-faint:#8B999B;
+    --line:#D7E0E1;
+    --accent:#0F6E63;
+    --accent-soft:#DCEEEA;
+    --danger:#B3261E;
+    --shadow: 0 1px 2px rgba(17,26,28,.06), 0 4px 14px rgba(17,26,28,.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0F1416;
+      --surface:#171F21;
+      --surface-2:#1E2729;
+      --ink:#E9EFEF;
+      --ink-soft:#A7B4B5;
+      --ink-faint:#728082;
+      --line:#293335;
+      --accent:#4FC3B3;
+      --accent-soft:#1B2E2A;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.45;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:20px 20px 60px;}
+
+  /* header */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
+    padding-block:10px 20px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:42px; height:42px; border-radius:11px;
+    background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; flex:none;
+  }
+  header h1{font-size:1.3rem; margin:0; letter-spacing:-.01em;}
+  header .sub{font-size:.8rem; color:var(--ink-soft); margin:1px 0 0;}
+  .stats{display:flex; gap:10px; flex-wrap:wrap;}
+  .stat{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:8px 14px; min-width:84px; text-align:center; box-shadow:var(--shadow);
+  }
+  .stat b{display:block; font-size:1.25rem; line-height:1.1;}
+  .stat span{font-size:.68rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em;}
+
+  /* layout */
+  .grid{display:grid; grid-template-columns:340px 1fr 300px; gap:16px; align-items:start;}
+  @media (max-width:980px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    box-shadow:var(--shadow); padding:18px;
+  }
+  .panel h2{font-size:.95rem; margin:0 0 14px; display:flex; align-items:center; gap:8px;}
+  .panel h2 .count{
+    margin-left:auto; font-family:monospace; font-size:.75rem; color:var(--ink-soft);
+    background:var(--surface-2); padding:2px 8px; border-radius:999px;
+  }
+
+  /* form */
+  label{display:block; font-size:.78rem; color:var(--ink-soft); margin:0 0 5px;}
+  input[type=text]{
+    width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:8px;
+    background:var(--bg); color:var(--ink); font-size:.92rem; margin-bottom:14px;
+  }
+  input[type=text]:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .cor-picker{display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:16px;}
+  .cor-opt{
+    border:1.5px solid var(--line); border-radius:9px; padding:8px 10px;
+    display:flex; align-items:center; gap:8px; cursor:pointer; font-size:.82rem;
+    background:var(--surface);
+  }
+  .cor-opt input{margin:0;}
+  .cor-opt .dot{width:12px; height:12px; border-radius:50%; flex:none;}
+  .cor-opt.selected{border-color:var(--sel-color, var(--accent)); background:var(--sel-bg, var(--accent-soft));}
+  .btn{
+    width:100%; padding:11px; border:none; border-radius:9px;
+    background:var(--accent); color:#fff; font-size:.92rem; font-weight:600;
+    cursor:pointer;
+  }
+  .btn:hover{filter:brightness(1.06);}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  .btn.secondary{background:var(--surface-2); color:var(--ink);}
+  .btn.small{width:auto; padding:6px 11px; font-size:.76rem; border-radius:7px;}
+  .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--ink-soft);}
+
+  .actions-row{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;}
+
+  /* fila */
+  .fila-cor-group{margin-bottom:16px;}
+  .fila-cor-group:last-child{margin-bottom:0;}
+  .fila-cor-head{
+    display:flex; align-items:center; gap:8px; font-size:.78rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.03em; margin-bottom:8px; color:var(--ink-soft);
+  }
+  .fila-cor-head .dot{width:10px; height:10px; border-radius:50%;}
+  .fila-cor-head .n{margin-left:auto; font-family:monospace; font-weight:400;}
+  .paciente-card{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--card-color, var(--accent));
+    border-radius:9px; padding:9px 12px; margin-bottom:7px;
+  }
+  .paciente-card .info{flex:1; min-width:0;}
+  .paciente-card .nome{font-size:.9rem; font-weight:600;}
+  .paciente-card .meta{font-size:.72rem; color:var(--ink-faint); font-family:monospace;}
+  .paciente-card .acoes{display:flex; gap:6px; flex:none;}
+  .icon-btn{
+    border:1px solid var(--line); background:var(--surface); border-radius:6px;
+    width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:.85rem; color:var(--ink-soft);
+  }
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent);}
+
+  .vazio{color:var(--ink-faint); font-size:.85rem; padding:10px 2px;}
+
+  /* historico */
+  .hist-item{
+    padding:9px 0; border-bottom:1px solid var(--line); font-size:.85rem;
+  }
+  .hist-item:last-child{border-bottom:none;}
+  .hist-item .nome{font-weight:600;}
+  .hist-item .meta{font-size:.72rem; color:var(--ink-faint); font-family:monospace; margin-top:1px;}
+  .badge{
+    display:inline-block; font-size:.65rem; font-weight:700; text-transform:uppercase;
+    padding:2px 7px; border-radius:999px; color:#fff; letter-spacing:.03em;
+  }
+
+  select.reclass{
+    font-size:.78rem; padding:5px 7px; border-radius:6px; border:1px solid var(--line);
+    background:var(--surface); color:var(--ink);
+  }
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px;
+    font-size:.82rem; box-shadow:var(--shadow); opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+  .footer-note{
+    text-align:center; color:var(--ink-faint); font-size:.72rem; margin-top:26px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">✚</div>
+      <div>
+        <h1>Sistema de Triagem — Pronto-Socorro</h1>
+        <p class="sub">Protótipo de interface · Protocolo de Manchester · Algoritmos e Estrutura de Dados I</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="stat-aguardando">0</b><span>Aguardando</span></div>
+      <div class="stat"><b id="stat-atendidos">0</b><span>Atendidos</span></div>
+      <div class="stat"><b id="stat-espera">—</b><span>Maior espera</span></div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- Coluna 1: cadastro -->
+    <div class="panel">
+      <h2>🩺 Nova triagem</h2>
+      <label for="nome">Nome do paciente</label>
+      <input type="text" id="nome" placeholder="Ex.: Ana Beatriz Souza" maxlength="60">
+
+      <label>Classificação (Protocolo de Manchester)</label>
+      <div class="cor-picker" id="cor-picker"></div>
+
+      <button class="btn" id="btn-cadastrar">Registrar paciente</button>
+
+      <div class="actions-row">
+        <button class="btn secondary small" id="btn-exemplo" style="flex:1">Carregar exemplo</button>
+        <button class="btn ghost small" id="btn-limpar" style="flex:1">Reiniciar tudo</button>
+      </div>
+    </div>
+
+    <!-- Coluna 2: fila -->
+    <div class="panel">
+      <h2>⏳ Fila de espera <span class="count" id="fila-count">0 pacientes</span></h2>
+      <div id="fila-container"></div>
+
+      <div class="actions-row">
+        <button class="btn" id="btn-atender" style="flex:2">Atender próximo paciente</button>
+        <button class="btn ghost" id="btn-desfazer" style="flex:1" disabled>↩ Desfazer</button>
+      </div>
+    </div>
+
+    <!-- Coluna 3: historico -->
+    <div class="panel">
+      <h2>📋 Histórico <span class="count" id="hist-count">0</span></h2>
+      <div id="historico-container"></div>
+    </div>
+
+  </div>
+
+  <p class="footer-note">Protótipo de front-end — a lógica (fila de prioridade por cor, FIFO por nível de gravidade, undo de reclassificação) roda em JavaScript aqui, espelhando o sistema em Python do projeto.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CORES = [
+  {key:'vermelho', label:'Vermelho — Emergência',    hex:'#DC2626', bg:'#FBE7E6', prioridade:1},
+  {key:'laranja',  label:'Laranja — Muito urgente',   hex:'#EA580C', bg:'#FCEADD', prioridade:2},
+  {key:'amarelo',  label:'Amarelo — Urgente',         hex:'#B45309', bg:'#FCF1D6', prioridade:3},
+  {key:'verde',    label:'Verde — Pouco urgente',     hex:'#15803D', bg:'#E1F3E5', prioridade:4},
+  {key:'azul',     label:'Azul — Não urgente',        hex:'#1D4ED8', bg:'#E2E9FC', prioridade:5},
+];
+const corPorKey = Object.fromEntries(CORES.map(c => [c.key, c]));
+
+// ---------- estado ----------
+let proximoId = 1;
+let filas = Object.fromEntries(CORES.map(c => [c.key, []]));   // paciente: {id, nome, chegada}
+let historico = [];                                             // mais recente primeiro
+let ultimaAcao = null;                                          // pilha de 1 nivel: {tipo, ...}
+let corSelecionada = 'amarelo';
+
+// ---------- utilidades ----------
+function formatarHora(ts){
+  return new Date(ts).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+function tempoDecorrido(ts){
+  const s = Math.floor((Date.now() - ts) / 1000);
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return (m > 0 ? m + 'min ' : '') + r + 's';
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._h);
+  toast._h = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ---------- logica de dominio (espelha sistema_triagem.py) ----------
+function cadastrarPaciente(nome, cor){
+  const p = {id: proximoId++, nome: nome.trim(), chegada: Date.now()};
+  filas[cor].push(p);
+  render();
+  toast(`${p.nome} cadastrado(a) — ${corPorKey[cor].label.split(' —')[0]}`);
+}
+
+function proximaCorNaoVazia(){
+  return CORES.slice().sort((a,b) => a.prioridade - b.prioridade)
+              .find(c => filas[c.key].length > 0);
+}
+
+function atenderProximo(){
+  const cor = proximaCorNaoVazia();
+  if (!cor){ toast('Não há pacientes aguardando.'); return; }
+  const paciente = filas[cor.key].shift();
+  historico.unshift({...paciente, cor: cor.key, atendidoEm: Date.now()});
+  render();
+  toast(`Atendendo agora: ${paciente.nome} (${cor.label.split(' —')[0]})`);
+}
+
+function reclassificar(id, corAtual, novaCor){
+  if (corAtual === novaCor) return;
+  const idx = filas[corAtual].findIndex(p => p.id === id);
+  if (idx === -1) return;
+  const [paciente] = filas[corAtual].splice(idx, 1);
+  filas[novaCor].push(paciente);
+  ultimaAcao = {tipo:'reclassificacao', pacienteId:id, nome:paciente.nome, de:corAtual, para:novaCor};
+  render();
+  toast(`${paciente.nome} reclassificado(a): ${corPorKey[corAtual].label.split(' —')[0]} → ${corPorKey[novaCor].label.split(' —')[0]}`);
+}
+
+function desfazerUltimaAcao(){
+  if (!ultimaAcao) return;
+  if (ultimaAcao.tipo === 'reclassificacao'){
+    const idx = filas[ultimaAcao.para].findIndex(p => p.id === ultimaAcao.pacienteId);
+    if (idx !== -1){
+      const [paciente] = filas[ultimaAcao.para].splice(idx, 1);
+      filas[ultimaAcao.de].push(paciente);
+      toast(`Desfeito: ${paciente.nome} voltou para ${corPorKey[ultimaAcao.de].label.split(' —')[0]}`);
+    }
+  }
+  ultimaAcao = null;
+  render();
+}
+
+function reiniciar(){
+  proximoId = 1; filas = Object.fromEntries(CORES.map(c => [c.key, []])); historico = []; ultimaAcao = null;
+  render();
+  toast('Sistema reiniciado.');
+}
+
+function carregarExemplo(){
+  reiniciar();
+  const exemplo = [
+    ['Marcos Ferreira','vermelho'], ['Julia Nascimento','laranja'], ['Heitor Almeida','laranja'],
+    ['Bruna Castro','amarelo'], ['Elisa Ramos','amarelo'], ['Ana Beatriz Souza','verde'],
+    ['Gisele Prado','verde'], ['Carla Menezes','azul'],
+  ];
+  exemplo.forEach(([nome,cor]) => { filas[cor].push({id: proximoId++, nome, chegada: Date.now() - Math.random()*300000}); });
+  render();
+  toast('Exemplo carregado — 8 pacientes na fila.');
+}
+
+// ---------- render ----------
+function montarCorPicker(){
+  const wrap = document.getElementById('cor-picker');
+  wrap.innerHTML = '';
+  CORES.forEach(c => {
+    const el = document.createElement('label');
+    el.className = 'cor-opt' + (c.key === corSelecionada ? ' selected' : '');
+    el.style.setProperty('--sel-color', c.hex);
+    el.style.setProperty('--sel-bg', c.bg);
+    el.innerHTML = `<input type="radio" name="cor" value="${c.key}" ${c.key===corSelecionada?'checked':''}>
+                     <span class="dot" style="background:${c.hex}"></span>${c.label}`;
+    el.querySelector('input').addEventListener('change', () => { corSelecionada = c.key; montarCorPicker(); });
+    wrap.appendChild(el);
+  });
+}
+
+function render(){
+  // stats
+  const totalAguardando = CORES.reduce((s,c) => s + filas[c.key].length, 0);
+  document.getElementById('stat-aguardando').textContent = totalAguardando;
+  document.getElementById('stat-atendidos').textContent = historico.length;
+  document.getElementById('fila-count').textContent = totalAguardando + ' paciente' + (totalAguardando===1?'':'s');
+  document.getElementById('hist-count').textContent = historico.length;
+
+  let maiorEspera = 0;
+  CORES.forEach(c => filas[c.key].forEach(p => { maiorEspera = Math.max(maiorEspera, Date.now()-p.chegada); }));
+  document.getElementById('stat-espera').textContent = totalAguardando ? Math.floor(maiorEspera/1000)+'s' : '—';
+
+  // fila
+  const filaEl = document.getElementById('fila-container');
+  filaEl.innerHTML = '';
+  let algumPaciente = false;
+  CORES.forEach(c => {
+    const lista = filas[c.key];
+    const grupo = document.createElement('div');
+    grupo.className = 'fila-cor-group';
+    grupo.innerHTML = `<div class="fila-cor-head"><span class="dot" style="background:${c.hex}"></span>${c.label}<span class="n">${lista.length}</span></div>`;
+    if (lista.length === 0){
+      grupo.innerHTML += `<div class="vazio">— ninguém aguardando —</div>`;
+    } else {
+      algumPaciente = true;
+      lista.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'paciente-card';
+        card.style.setProperty('--card-color', c.hex);
+        const selectOptions = CORES.map(cc => `<option value="${cc.key}" ${cc.key===c.key?'selected':''}>${cc.label.split(' —')[0]}</option>`).join('');
+        card.innerHTML = `
+          <div class="info">
+            <div class="nome">${p.nome}</div>
+            <div class="meta">#${p.id} · chegou ${formatarHora(p.chegada)} · esperando <span data-chegada="${p.chegada}">${tempoDecorrido(p.chegada)}</span></div>
+          </div>
+          <div class="acoes">
+            <select class="reclass" data-id="${p.id}" data-cor="${c.key}">${selectOptions}</select>
+          </div>`;
+        card.querySelector('select').addEventListener('change', (e) => {
+          reclassificar(p.id, c.key, e.target.value);
+        });
+        grupo.appendChild(card);
+      });
+    }
+    filaEl.appendChild(grupo);
+  });
+
+  document.getElementById('btn-atender').disabled = !algumPaciente;
+  document.getElementById('btn-desfazer').disabled = !ultimaAcao;
+
+  // historico
+  const histEl = document.getElementById('historico-container');
+  histEl.innerHTML = '';
+  if (historico.length === 0){
+    histEl.innerHTML = '<div class="vazio">Nenhum paciente atendido ainda.</div>';
+  } else {
+    historico.forEach(p => {
+      const c = corPorKey[p.cor];
+      const item = document.createElement('div');
+      item.className = 'hist-item';
+      item.innerHTML = `<span class="badge" style="background:${c.hex}">${c.key}</span> <span class="nome">${p.nome}</span>
+                         <div class="meta">#${p.id} · atendido às ${formatarHora(p.atendidoEm)}</div>`;
+      histEl.appendChild(item);
+    });
+  }
+}
+
+// atualiza os cronometros de espera sem re-renderizar tudo
+setInterval(() => {
+  document.querySelectorAll('[data-chegada]').forEach(el => {
+    el.textContent = tempoDecorrido(Number(el.dataset.chegada));
+  });
+}, 1000);
+
+// ---------- eventos ----------
+document.getElementById('btn-cadastrar').addEventListener('click', () => {
+  const nomeEl = document.getElementById('nome');
+  const nome = nomeEl.value.trim();
+  if (!nome){ toast('Digite o nome do paciente.'); nomeEl.focus(); return; }
+  cadastrarPaciente(nome, corSelecionada);
+  nomeEl.value = '';
+  nomeEl.focus();
+});
+document.getElementById('nome').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-cadastrar').click(); });
+document.getElementById('btn-atender').addEventListener('click', atenderProximo);
+document.getElementById('btn-desfazer').addEventListener('click', desfazerUltimaAcao);
+document.getElementById('btn-exemplo').addEventListener('click', carregarExemplo);
+document.getElementById('btn-limpar').addEventListener('click', reiniciar);
+
+montarCorPicker();
+render();
+</script>
+</body>
+</html>
