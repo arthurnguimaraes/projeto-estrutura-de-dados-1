@@ -79,6 +79,26 @@ class SistemaTriagem:
         gerenciador.desfazer()
         self._reconstruir_fila_apos_reclassificacao()
 
+    def refazer_reclassificacao(self, id_paciente):
+        """Reaplica a ultima reclassificacao desfeita de um paciente ainda em espera."""
+        gerenciador = self._gerenciadores_reclassificacao[id_paciente]
+        gerenciador.refazer()
+        self._reconstruir_fila_apos_reclassificacao()
+
+    def pode_desfazer_reclassificacao(self, id_paciente):
+        """
+        True se o paciente (ainda em espera) tiver alguma reclassificacao
+        para desfazer. Pensado para interfaces habilitarem/desabilitarem
+        um botao "Desfazer" sem precisar tentar-e-tratar excecao.
+        """
+        gerenciador = self._gerenciadores_reclassificacao.get(id_paciente)
+        return gerenciador is not None and gerenciador.pode_desfazer()
+
+    def pode_refazer_reclassificacao(self, id_paciente):
+        """Analogo a pode_desfazer_reclassificacao(), mas para o redo."""
+        gerenciador = self._gerenciadores_reclassificacao.get(id_paciente)
+        return gerenciador is not None and gerenciador.pode_refazer()
+
     def _reconstruir_fila_apos_reclassificacao(self):
         """
         Como a FilaPrioridade organiza pacientes por cor em filas
@@ -118,6 +138,16 @@ class SistemaTriagem:
 
     def pacientes_por_cor(self):
         return self._fila_espera.tamanho_por_cor()
+
+    def fila_detalhada(self):
+        """
+        Retorna {cor: [pacientes]} com todos os pacientes aguardando,
+        agrupados por cor e em ordem de chegada (FIFO) dentro de cada
+        cor. Diferente de pacientes_por_cor() (so contagem), pensado
+        para interfaces graficas que precisam listar a fila inteira,
+        paciente a paciente (ver interface_grafica.py).
+        """
+        return self._fila_espera.detalhar_por_cor()
 
     def posicao_na_fila(self, id_paciente):
         return self._fila_espera.posicao_estimada(id_paciente)
