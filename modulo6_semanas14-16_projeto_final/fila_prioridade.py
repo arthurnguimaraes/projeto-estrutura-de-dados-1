@@ -78,6 +78,17 @@ class FilaPrioridade:
         """Retorna um dicionario {cor: quantidade_aguardando}, util para paineis/relatorios."""
         return {cor: fila.tamanho() for cor, fila in self._filas_por_cor.items()}
 
+    def detalhar_por_cor(self):
+        """
+        Retorna um dicionario {cor: [pacientes]} com a lista completa de
+        pacientes aguardando em cada cor, na ordem FIFO (quem chegou
+        primeiro aparece primeiro). Complementa tamanho_por_cor(), que so
+        da a contagem: usado por interfaces (ex.: a GUI) que precisam
+        listar cada paciente da fila, nao so quantifica-los.
+        Complexidade: O(n).
+        """
+        return {cor: fila.percorrer() for cor, fila in self._filas_por_cor.items()}
+
     def posicao_estimada(self, id_paciente):
         """
         Retorna a posicao estimada do paciente na fila de atendimento
