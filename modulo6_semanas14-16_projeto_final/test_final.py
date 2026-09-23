@@ -85,12 +85,52 @@ def testar_sistema_vazio():
     checar("posicao na fila em sistema vazio retorna -1", s.posicao_na_fila(1), -1)
 
 
+def testar_fila_detalhada_e_redo_para_gui():
+    """
+    Cobre as consultas adicionadas para a interface_grafica.py:
+    fila_detalhada() (lista completa por cor, nao so contagem) e o
+    redo de reclassificacao (refazer_reclassificacao / pode_desfazer_
+    reclassificacao / pode_refazer_reclassificacao).
+    """
+    s = SistemaTriagem()
+    ana = s.cadastrar_paciente("Ana", "azul")
+    bruno = s.cadastrar_paciente("Bruno", "verde")
+
+    detalhado = s.fila_detalhada()
+    checar("fila_detalhada tem uma lista por cor (5 cores)", len(detalhado), 5)
+    checar("fila_detalhada agrupa Ana em 'azul'", [p.nome for p in detalhado["azul"]], ["Ana"])
+    checar("fila_detalhada agrupa Bruno em 'verde'", [p.nome for p in detalhado["verde"]], ["Bruno"])
+    checar("fila_detalhada nao lista ninguem em 'vermelho'", detalhado["vermelho"], [])
+
+    checar("antes de reclassificar, nao ha o que desfazer",
+           s.pode_desfazer_reclassificacao(ana.id), False)
+    checar("antes de reclassificar, nao ha o que refazer",
+           s.pode_refazer_reclassificacao(ana.id), False)
+
+    s.reclassificar_paciente(ana.id, "vermelho")
+    checar("apos reclassificar, ha o que desfazer", s.pode_desfazer_reclassificacao(ana.id), True)
+    checar("apos reclassificar, ainda nao ha o que refazer",
+           s.pode_refazer_reclassificacao(ana.id), False)
+
+    s.desfazer_reclassificacao(ana.id)
+    checar("apos desfazer, Ana volta para 'azul' em fila_detalhada",
+           [p.nome for p in s.fila_detalhada()["azul"]], ["Ana"])
+    checar("apos desfazer, ha o que refazer", s.pode_refazer_reclassificacao(ana.id), True)
+
+    s.refazer_reclassificacao(ana.id)
+    checar("apos refazer, Ana volta para 'vermelho' em fila_detalhada",
+           [p.nome for p in s.fila_detalhada()["vermelho"]], ["Ana"])
+    checar("apos refazer, Ana e atendida antes de Bruno (vermelho > verde)",
+           s.atender_proximo().nome, "Ana")
+
+
 if __name__ == "__main__":
     testar_fluxo_completo()
     testar_reclassificacao_integrada()
     testar_desfazer_reclassificacao_integrada()
     testar_busca_no_historico()
     testar_sistema_vazio()
+    testar_fila_detalhada_e_redo_para_gui()
 
     print(f"\nResumo: {testes_ok} passaram, {testes_falha} falharam.")
     if testes_falha > 0:
