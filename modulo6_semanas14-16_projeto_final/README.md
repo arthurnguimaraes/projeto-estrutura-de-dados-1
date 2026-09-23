@@ -42,12 +42,59 @@ python3 interface_cli.py
 python3 test_final.py
 ```
 
+### Problemas comuns ao executar (Windows)
+
+**"Python não foi encontrado" / abre a Microsoft Store**
+Acontece quando o Python não está instalado de verdade — o Windows
+tem um atalho falso que aparece mesmo sem o Python instalado. Baixe
+o instalador oficial em <https://www.python.org/downloads/> e, na
+primeira tela do instalador, **marque a caixinha "Add python.exe to
+PATH"** antes de clicar em Install. Depois de instalar, feche o
+terminal e abra um novo (terminais já abertos não veem a instalação).
+
+**`python3` não é reconhecido, mas `python` funciona (ou o
+contrário)**
+Depende de como o Python foi instalado nessa máquina. Tente os dois:
+
+```cmd
+python3 interface_grafica.py
+```
+
+```cmd
+python interface_grafica.py
+```
+
+**"No such file or directory" / "não é possível localizar o caminho
+especificado"**
+Normalmente é porque o terminal não está na pasta certa. Depois de
+baixar e extrair o `.zip` do projeto, confira o que tem na pasta
+atual:
+
+```cmd
+dir
+```
+
+Se aparecer uma subpasta (por exemplo `sistema-triagem`) em vez dos
+arquivos `.py` diretamente, entre nela antes de rodar:
+
+```cmd
+cd sistema-triagem
+```
+
+Repita o `dir` até ver `interface_grafica.py` na lista — só então
+rode o programa.
+
+**Abrir um terminal já dentro da pasta certa**
+Com a pasta do projeto aberta no Explorer (vendo os arquivos `.py`),
+clique na barra de endereço, apague o caminho, digite `cmd` e aperte
+Enter. Um terminal abre já posicionado ali, sem precisar de `cd`.
+
 ### Sobre `interface_grafica.py`
 
 Programa executável com interface gráfica de verdade (janela, não
 terminal), construído com **Tkinter** (biblioteca padrão do Python —
 nenhuma dependência externa). Ele **não duplica nenhuma regra de
-negócio**: chama diretamente os métodos públicos de `SistemaTriagem`
+negócio**: chama diretamente os métodos pöblicos de `SistemaTriagem`
 (o mesmo `sistema_triagem.py` usado por `interface_cli.py` e pelos
 testes) e só desenha o resultado na tela. A janela mostra a fila de
 espera agrupada por cor, permite cadastrar/atender pacientes, e
