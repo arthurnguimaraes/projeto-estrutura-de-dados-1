@@ -24,6 +24,8 @@ disciplina:
 | `test_final.py` | 28 testes de integração |
 | `relatorio.md` | Relatório técnico final |
 | `apresentacao_roteiro.md` | Roteiro para a apresentação (10–15 min) |
+| `docs/ARQUITETURA.md` | Visão geral da arquitetura + diagrama de componentes |
+| `docs/decisoes/` | ADRs — motivo das decisões técnicas mais importantes |
 | `paciente.py`, `validacao.py`, `utils.py` | Base (Módulo 1) |
 | `pilha_array.py`, `undo_redo_classificacao.py` | Base (Módulo 4) |
 | `fila_prioridade.py`, `fila_encadeada.py` | Base (Módulo 5) |
@@ -127,12 +129,40 @@ quem quiser uma demonstração rápida sem precisar rodar Python.
    sistema permite reclassificar o paciente (e desfazer, se necessário)
    enquanto ele ainda está na fila de espera.
 
-## Decisões de projeto
+## Arquitetura e decisões técnicas
+
+Para quem for mexer no código depois (ou avaliar o projeto), a
+documentação de arquitetura está separada em:
+
+- [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) — visão geral, diagrama
+  de componentes (interfaces → `SistemaTriagem` → estruturas de dados)
+  e o fluxo de dados de ponta a ponta.
+- [`docs/decisoes/`](docs/decisoes/) — ADRs (Architecture Decision
+  Records) registrando o motivo de cada decisão técnica importante:
+  - [ADR-001](docs/decisoes/ADR-001-fila-por-cor.md) — fila de
+    prioridade como 5 filas FIFO separadas por cor
+  - [ADR-002](docs/decisoes/ADR-002-reclassificacao-o-n.md) —
+    reclassificação reconstrói a fila inteira (O(n))
+  - [ADR-003](docs/decisoes/ADR-003-sem-persistencia.md) — sem
+    persistência em disco/banco de dados
+- [`relatorio.md`](relatorio.md) — análise de complexidade completa de
+  cada operação.
+
+Resumo rápido das duas decisões mais relevantes:
 
 - A reclassificação exige **reconstruir a fila de prioridade** (O(n)),
   pois a estrutura organiza pacientes em filas separadas por cor — essa
   escolha foi feita conscientemente, já que reclassificações são raras
-  comparadas a atender/enfileirar (ver `relatorio.md`).
+  comparadas a atender/enfileirar (ver ADR-002).
 - Reavaliação automática por tempo de espera **não foi implementada**
   (ver discussão de escopo no relatório do Módulo 5) — mantida fora do
   projeto final para preservar o cronograma de 16 semanas.
+
+### Sobre documentação de API
+
+Este projeto **não expõe API** (não tem rotas HTTP nem integrações
+externas) — é uma aplicação local (CLI + janela Tkinter), então a
+seção de "documentação de API" não se aplica aqui. Se no futuro o
+sistema ganhar uma camada de rede (por exemplo, um backend web),
+documentar os endpoints com exemplos de requisição/resposta passaria a
+fazer sentido.
