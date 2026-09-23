@@ -94,7 +94,7 @@ Enter. Um terminal abre já posicionado ali, sem precisar de `cd`.
 Programa executável com interface gráfica de verdade (janela, não
 terminal), construído com **Tkinter** (biblioteca padrão do Python —
 nenhuma dependência externa). Ele **não duplica nenhuma regra de
-negócio**: chama diretamente os métodos pöblicos de `SistemaTriagem`
+negócio**: chama diretamente os métodos públicos de `SistemaTriagem`
 (o mesmo `sistema_triagem.py` usado por `interface_cli.py` e pelos
 testes) e só desenha o resultado na tela. A janela mostra a fila de
 espera agrupada por cor, permite cadastrar/atender pacientes, e
