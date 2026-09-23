@@ -18,8 +18,10 @@ disciplina:
 | Arquivo | Descrição |
 |---|---|
 | `sistema_triagem.py` | Classe `SistemaTriagem` — integra as 3 estruturas |
-| `interface_cli.py` | Menu interativo de linha de comando |
-| `test_final.py` | 16 testes de integração |
+| `interface_cli.py` | Menu interativo de linha de comando (texto) |
+| `interface_grafica.py` | Interface gráfica (janela, Tkinter) — ver seção abaixo |
+| `interface_web_prototipo.html` | Protótipo de front-end web (HTML/CSS/JS), espelha a mesma lógica |
+| `test_final.py` | 28 testes de integração |
 | `relatorio.md` | Relatório técnico final |
 | `apresentacao_roteiro.md` | Roteiro para a apresentação (10–15 min) |
 | `paciente.py`, `validacao.py`, `utils.py` | Base (Módulo 1) |
@@ -30,12 +32,42 @@ disciplina:
 ## Como executar
 
 ```bash
-# Rodar o sistema interativo (menu no terminal)
+# Rodar o sistema com JANELA (Tkinter) - programa executavel com tela
+python3 interface_grafica.py
+
+# Rodar o sistema interativo por menu (texto, no terminal)
 python3 interface_cli.py
 
 # Rodar os testes de integração
 python3 test_final.py
 ```
+
+### Sobre `interface_grafica.py`
+
+Programa executável com interface gráfica de verdade (janela, não
+terminal), construído com **Tkinter** (biblioteca padrão do Python —
+nenhuma dependência externa). Ele **não duplica nenhuma regra de
+negócio**: chama diretamente os métodos públicos de `SistemaTriagem`
+(o mesmo `sistema_triagem.py` usado por `interface_cli.py` e pelos
+testes) e só desenha o resultado na tela. A janela mostra a fila de
+espera agrupada por cor, permite cadastrar/atender pacientes, e
+expõe undo **e redo** de reclassificação (usando a pilha dupla de
+`undo_redo_classificacao.py` — o `interface_cli.py` só expõe o undo).
+
+Requisitos: apenas Python 3 com Tkinter. Na maioria dos sistemas
+(Windows, macOS, e a maior parte das distros Linux) já vem incluído.
+Se aparecer `ModuleNotFoundError: No module named 'tkinter'` em
+alguma distro Linux, instale o pacote do sistema operacional:
+
+```bash
+sudo apt install python3-tk        # Debian/Ubuntu
+sudo dnf install python3-tkinter   # Fedora
+```
+
+Há também um protótipo de front-end **web** (`interface_web_prototipo.html`,
+HTML/CSS/JS puro, sem instalação — basta abrir no navegador), que
+espelha a mesma lógica de fila/histórico/undo em JavaScript, para
+quem quiser uma demonstração rápida sem precisar rodar Python.
 
 ## Fluxo principal do sistema
 
