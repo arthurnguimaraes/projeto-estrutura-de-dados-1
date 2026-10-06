@@ -20,7 +20,6 @@ disciplina:
 | `sistema_triagem.py` | Classe `SistemaTriagem` — integra as 3 estruturas |
 | `interface_cli.py` | Menu interativo de linha de comando (texto) |
 | `interface_grafica.py` | Interface gráfica (janela, Tkinter) — ver seção abaixo |
-| `interface_web_prototipo.html` | Protótipo de front-end web (HTML/CSS/JS), espelha a mesma lógica |
 | `test_final.py` | 28 testes de integração |
 | `relatorio.md` | Relatório técnico final |
 | `apresentacao_roteiro.md` | Roteiro para a apresentação (10–15 min) |
@@ -112,11 +111,6 @@ alguma distro Linux, instale o pacote do sistema operacional:
 sudo apt install python3-tk        # Debian/Ubuntu
 sudo dnf install python3-tkinter   # Fedora
 ```
-
-Há também um protótipo de front-end **web** (`interface_web_prototipo.html`,
-HTML/CSS/JS puro, sem instalação — basta abrir no navegador), que
-espelha a mesma lógica de fila/histórico/undo em JavaScript, para
-quem quiser uma demonstração rápida sem precisar rodar Python.
 
 ## Fluxo principal do sistema
 
