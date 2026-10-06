@@ -11,9 +11,9 @@ concentra toda a regra de negócio) → **estruturas de dados** (onde a
 informação de fato é guardada e organizada).
 
 Nenhuma interface acessa uma estrutura de dados diretamente — tudo
-passa por `SistemaTriagem`. Isso é o que permite ter três formas
-diferentes de usar o sistema (linha de comando, janela gráfica, e um
-protótipo web) sem duplicar nenhuma regra de negócio.
+passa por `SistemaTriagem`. Isso é o que permite ter duas formas
+diferentes de usar o sistema (linha de comando e janela gráfica) sem
+duplicar nenhuma regra de negócio.
 
 ## Diagrama de componentes
 
@@ -28,7 +28,6 @@ flowchart TB
             direction LR
             CLI["interface_cli.py<br/><i>menu de texto</i>"]
             GUI["interface_grafica.py<br/><i>janela Tkinter</i>"]
-            WEB["interface_web_prototipo.html<br/><i>protótipo JS — só demo visual</i>"]
         end
 
         Core["SistemaTriagem<br/>(sistema_triagem.py)<br/><i>regra de negócio</i>"]
@@ -43,7 +42,6 @@ flowchart TB
 
     Ator -->|usa| CLI
     Ator -->|usa| GUI
-    Ator -.->|abre no navegador,<br/>não roda o Python| WEB
 
     CLI --> Core
     GUI --> Core
@@ -51,15 +49,7 @@ flowchart TB
     Core --> Fila
     Core --> Historico
     Core --> UndoRedo
-
-    style WEB stroke-dasharray: 4 4
 ```
-
-> `interface_web_prototipo.html` está pontilhado porque é uma
-> reimplementação em JavaScript feita só para demonstração visual
-> rápida — ela não chama o código Python nem o `SistemaTriagem`. Ver
-> [`README.md`](../README.md#sobre-interface_web_prototipohtml) para
-> detalhes.
 
 ## Fluxo de dados (exemplo: atender um paciente)
 
@@ -87,7 +77,6 @@ interface só chama `SistemaTriagem.reclassificar_paciente(...)` /
 | `sistema_triagem.py` | Único ponto de entrada da regra de negócio; integra as demais estruturas |
 | `interface_cli.py` | Apresentação em texto (menu de terminal) |
 | `interface_grafica.py` | Apresentação em janela (Tkinter) |
-| `interface_web_prototipo.html` | Protótipo visual em HTML/CSS/JS, independente do Python |
 | `fila_prioridade.py` / `fila_encadeada.py` | Fila de espera organizada por gravidade |
 | `lista_encadeada_simples.py` | Histórico de pacientes já atendidos |
 | `pilha_array.py` / `undo_redo_classificacao.py` | Desfazer/refazer reclassificações |
